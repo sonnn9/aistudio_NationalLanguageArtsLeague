@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>National Language Arts League Quiz</title>
+    <style>
+        :root {
+            --primary: #4A90E2;
+            --secondary: #FF9F1C;
+            --success: #2ECC71;
+            --error: #E74C3C;
+            --bg: #F0F8FF;
+            --card-bg: #FFFFFF;
+            --text: #222222; /* Darker text for contrast */
+            /* Using standard, readable fonts */
+            --font-stack: 'Verdana', 'Segoe UI', 'Arial', sans-serif;
+        }
+
+        body {
+            font-family: var(--font-stack);
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+            font-size: 18px; /* Base font size increased */
+        }
+
+        .container {
+            max-width: 1200px; /* Wider layout */
+            margin: 0 auto;
+        }
+
+        /* Typography */
+        h1, h2, h3 {
+            color: var(--primary);
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+        
+        h1 { margin-bottom: 0.5rem; font-size: 2.5rem; }
+        h3 { font-size: 1.8rem; }
+        
+        .subtitle { 
+            text-align: center; 
+            color: #555; 
+            margin-bottom: 2rem; 
+            font-size: 1.3rem; 
+        }
+
+        /* Buttons */
+        .btn {
+            background-color: var(--secondary);
+            color: white;
+            padding: 18px 40px; /* Larger hit area */
+            font-size: 1.4rem; /* Larger text */
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: inherit;
+            box-shadow: 0 6px 0 #E68A00;
+            transition: transform 0.1s, box-shadow 0.1s;
+            margin: 30px auto;
+            display: block;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #E68A00;
+        }
+
+        .btn:hover {
+            background-color: #ffaa33;
+        }
+
+        /* Screens */
+        .screen {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Form Elements */
+        .select-wrapper {
+            margin: 30px auto;
+            text-align: center;
+        }
+        
+        .select-wrapper label {
+            font-size: 1.3rem;
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        select {
+            padding: 15px 25px;
+            font-size: 1.3rem;
+            border-radius: 12px;
+            border: 3px solid var(--primary);
+            font-family: inherit;
+            background: white;
+            cursor: pointer;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        /* Quiz Layout */
+        .section-container {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            border: 1px solid #E0E0E0;
+        }
+
+        .section-header {
+            background-color: var(--primary);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            margin: -30px -30px 25px -30px; /* Pull to edges */
+            text-align: center;
+        }
+
+        .instruction {
+            font-style: italic;
+            text-align: center;
+            color: #444;
+            margin-bottom: 25px;
+            background: #e1f0ff;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            border-left: 5px solid var(--primary);
+        }
+
+        /* Reading Passages */
+        .reading-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        @media (min-width: 900px) {
+            .reading-layout {
+                flex-direction: row;
+                align-items: flex-start;
+                gap: 40px;
+            }
+            .reading-passage-container {
+                flex: 1;
+                position: sticky;
+                top: 20px;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+            .questions-container {
+                flex: 1;
+            }
+        }
+
+        .reading-passage {
+            background: #fffbe6;
+            border: 3px dashed var(--secondary);
+            padding: 25px;
+            border-radius: 16px;
+            font-size: 1.3rem; /* Larger reading text */
+            line-height: 1.8;
+            color: #111;
+        }
+
+        .passage-title {
+            display: block;
+            font-weight: bold;
+            font-size: 1.5rem;
+            text-decoration: underline;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #333;
+        }
+
+        .poem-text {
+            white-space: pre-wrap;
+            text-align: center;
+            font-family: 'Verdana', sans-serif; /* Keep consistent font */
+            font-style: italic;
+        }
+
+        /* Questions */
+        .question-card {
+            background: #fff;
+            border: 2px solid #ddd;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .question-text {
+            font-weight: bold;
+            font-size: 1.4rem; /* Big question text */
+            margin-bottom: 20px;
+            line-height: 1.4;
+            color: #000;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        
+        /* Mobile: 1 column. Tablet+: 2 columns */
+        @media(min-width: 700px) {
+            .options-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        .option-label {
+            display: flex;
+            align-items: flex-start; /* Align top for multi-line answers */
+            background: #f9f9f9;
+            border: 2px solid #ccc;
+            padding: 15px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+            font-size: 1.25rem; /* Big option text */
+            line-height: 1.4;
+        }
+
+        .option-label:hover {
+            background: #eef6ff;
+            border-color: var(--primary);
+        }
+
+        .option-label input {
+            margin-right: 15px;
+            margin-top: 5px;
+            transform: scale(1.6); /* Big radio button */
+            accent-color: var(--primary);
+            flex-shrink: 0; /* Prevent radio shrink */
+        }
+
+        /* Results Styles */
+        .question-card.correct {
+            border-color: var(--success);
+            background-color: #f0fff4;
+            border-width: 3px;
+        }
+
+        .question-card.incorrect {
+            border-color: var(--error);
+            background-color: #fff5f5;
+            border-width: 3px;
+        }
+
+        .feedback-msg {
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .correct .feedback-msg {
+            display: block;
+            color: #155724;
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+        }
+
+        .incorrect .feedback-msg {
+            display: block;
+            color: #721c24;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
+
+        #score-banner {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            margin-bottom: 40px;
+        }
+
+        #score-number {
+            font-size: 4rem;
+            color: var(--primary);
+            font-weight: bold;
+            display: block;
+            margin: 20px 0;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px; /* Less padding on mobile edge */
+            }
+            
+            .container {
+                width: 100%;
+            }
+
+            h1 { font-size: 1.8rem; }
+            h3 { font-size: 1.4rem; }
+
+            .section-container {
+                padding: 15px; /* Tighter padding inside card */
+            }
+            
+            .section-header {
+                margin: -15px -15px 20px -15px;
+                border-radius: 12px 12px 0 0;
+            }
+
+            .reading-passage {
+                font-size: 1.2rem;
+                padding: 15px;
+            }
+            
+            .question-card {
+                padding: 15px;
+            }
+            
+            .question-text {
+                font-size: 1.25rem;
+            }
+            
+            .option-label {
+                font-size: 1.15rem;
+                padding: 12px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>National Language Arts League</h1>
+        <div class="subtitle" id="quiz-subtitle">Grade 2 Contest</div>
+    </header>
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="screen active">
+        <div style="background: white; padding: 40px 20px; border-radius: 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+            <h2>Welcome, Student!</h2>
+            <p style="font-size: 1.4rem; margin-top: 10px;">Choose a year to start the quiz.</p>
+            
+            <div class="select-wrapper">
+                <label for="year-select"><strong>Select Year: </strong></label>
+                <select id="year-select">
+                    <option value="2017">2017 Contest</option>
+                    <option value="2018">2018 Contest</option>
+                    <option value="2019">2019 Contest</option>
+                    <option value="2020">2020 Contest</option>
+                    <option value="2021">2021 Contest</option>
+                    <option value="2022">2022 Contest</option>
+                </select>
+            </div>
+            
+            <div style="margin: 30px 0; text-align: left; display: inline-block; font-size: 1.2rem; line-height: 2;">
+                <p>📝 <strong>25 Questions per quiz</strong></p>
+                <p>📖 <strong>Vocabulary, Reading, & Spelling</strong></p>
+                <p>⏱️ <strong>Take your time</strong></p>
+            </div>
+
+            <button id="btn-start" class="btn">Start Quiz</button>
+        </div>
+    </div>
+
+    <!-- Quiz Screen -->
+    <div id="quiz-screen" class="screen">
+        <div id="quiz-content">
+            <!-- Questions injected here by JS -->
+        </div>
+        <button id="btn-submit" class="btn">Submit Answers</button>
+    </div>
+
+    <!-- Results Screen -->
+    <div id="results-screen" class="screen">
+        <div id="score-banner">
+            <h2>Great Job!</h2>
+            <span id="score-number"></span>
+            <p style="font-size: 1.3rem;">Scroll down to see which questions you got right!</p>
+            <button id="btn-restart" class="btn">Try Another Quiz</button>
+        </div>
+        <div id="review-content">
+            <!-- Review content will be moved here or shown in place -->
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
